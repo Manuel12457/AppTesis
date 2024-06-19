@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/activity_inicio_sesion"
+    tools:context=".InicioSesion">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/abhaya_libre"
+            android:text="@string/inicio_sesion_title"
+            android:textSize="34sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputCorreo_iniSesion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:hint="Correo"
+            app:layout_constraintEnd_toEndOf="@+id/textView3"
+            app:layout_constraintStart_toStartOf="@+id/textView3"
+            app:layout_constraintTop_toBottomOf="@+id/textView3">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="302dp"
+                android:layout_height="50dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputPassword_iniSesion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Contraseña"
+            app:endIconMode="password_toggle"
+            app:layout_constraintEnd_toEndOf="@+id/inputCorreo_iniSesion"
+            app:layout_constraintStart_toStartOf="@+id/inputCorreo_iniSesion"
+            app:layout_constraintTop_toBottomOf="@+id/inputCorreo_iniSesion">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="302dp"
+                android:layout_height="50dp"
+                android:inputType="textPassword" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/btn_ingresar"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily="@font/abhaya_libre"
+            android:onClick="validarInicioSesion"
+            android:text="Ingresar"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@+id/inputPassword_iniSesion"
+            app:layout_constraintStart_toStartOf="@+id/inputPassword_iniSesion"
+            app:layout_constraintTop_toBottomOf="@+id/inputPassword_iniSesion" />
+
+        <Button
+            android:id="@+id/btn_registrarse3"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/abhaya_libre"
+            android:onClick="cambiarContrasenia"
+            android:text="Cambiar contraseña"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@+id/btn_ingresar"
+            app:layout_constraintStart_toStartOf="@+id/btn_ingresar"
+            app:layout_constraintTop_toBottomOf="@+id/btn_ingresar" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

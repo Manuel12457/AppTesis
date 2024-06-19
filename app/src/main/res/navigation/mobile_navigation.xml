@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_perfil">
+
+    <fragment
+        android:id="@+id/nav_perfil"
+        android:name="com.example.apptesis.fragments.nav_perfil"
+        android:label="@string/menu_perfil"
+        tools:layout="@layout/fragment_nav_perfil" />
+
+    <fragment
+        android:id="@+id/nav_calendario"
+        android:name="com.example.apptesis.fragments.nav_calendario"
+        android:label="@string/menu_calendario"
+        tools:layout="@layout/fragment_nav_calendario" />
+
+    <fragment
+        android:id="@+id/nav_modo_libre"
+        android:name="com.example.apptesis.fragments.nav_modoLibre"
+        android:label="@string/menu_modo_libre"
+        tools:layout="@layout/fragment_nav_modo_libre" />
+
+    <fragment
+        android:id="@+id/nav_practica"
+        android:name="com.example.apptesis.fragments.nav_practica"
+        android:label="@string/menu_practica"
+        tools:layout="@layout/fragment_nav_practica" />
+</navigation>

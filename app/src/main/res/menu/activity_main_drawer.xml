@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+        <item
+            android:id="@+id/user_item"
+            android:title="@string/user_subheader_title">
+            <menu>
+                <group android:checkableBehavior="single">
+                    <item
+                        android:id="@+id/nav_perfil"
+                        android:icon="@drawable/baseline_person_white_24"
+                        android:title="@string/menu_perfil" />
+                    <item
+                        android:id="@+id/nav_calendario"
+                        android:icon="@drawable/baseline_calendar_today_white_24"
+                        android:title="@string/menu_calendario" />
+                </group>
+            </menu>
+        </item>
+
+        <item
+            android:id="@+id/tools_item"
+            android:title="@string/tools_subheader_title">
+            <menu>
+                <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_modo_libre"
+                    android:icon="@drawable/baseline_accessibility_new_white_24"
+                    android:title="@string/menu_modo_libre" />
+                <item
+                    android:id="@+id/nav_practica"
+                    android:icon="@drawable/baseline_sign_language_white_24"
+                    android:title="@string/menu_practica" />
+                </group>
+            </menu>
+        </item>
+
+        <item
+            android:id="@+id/sign_out"
+            android:icon="@drawable/baseline_logout_white_24"
+            android:title="@string/menu_sign_out" />
+</menu>

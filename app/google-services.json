@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "767433985826",
+    "firebase_url": "https://tesis-b2e20-default-rtdb.firebaseio.com",
+    "project_id": "tesis-b2e20",
+    "storage_bucket": "tesis-b2e20.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:767433985826:android:107f3145885bb667fddf7b",
+        "android_client_info": {
+          "package_name": "com.example.apptesis"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIA3vt0GRj30D1XaqJFHPWtN9bCorxOdw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:767433985826:android:12d2a1e63be9d2f9fddf7b",
+        "android_client_info": {
+          "package_name": "com.example.tesis"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIA3vt0GRj30D1XaqJFHPWtN9bCorxOdw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

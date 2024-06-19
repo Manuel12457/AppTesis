@@ -1,0 +1,77 @@
+<resources>
+    <string name="app_name">AppTesis</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="user_subheader_title">Usuario</string>
+    <string name="tools_subheader_title">Herramientas</string>
+    <string name="menu_nombre">Manuel Alejandro</string>
+    <string name="menu_apellido">Flores Caycho</string>
+
+    <string name="menu_perfil">Perfil</string>
+    <string name="menu_calendario">Calendario</string>
+    <string name="menu_modo_libre">Modo libre</string>
+    <string name="menu_practica">Práctica</string>
+    <string name="menu_sign_out">Cerrar sesión</string>
+
+    <string name="inicio_sesion_title">Iniciar sesión</string>
+    <string name="cambio_contrasenia_title">Cambio de contraseña</string>
+    <string name="cambio_contrasenia_description">Ingrese el correo con el cual se ha registrado para proceder con el cambio de contraseña</string>
+    <string name="presentacion_title">¡Hola!</string>
+    <string name="presentacion_description">Con esta aplicación podrás practicar y aprender el Lenguaje de Señas Peruano</string>
+
+    <string name="practica_title">Práctica</string>
+    <string name="practica_description">Conoce y practica los gestos empleados en el lenguaje de señas peruano</string>
+    <string name="practica_leccion">Números</string>
+    <string name="practica_nombre_categoria">Dactilogía</string>
+    <string name="practica_descripcion_categoria">Letras del alfabeto</string>
+    <string name="practica_completion">20/27</string>
+    <string name="practica_completion_percentage">37%</string>
+    <string name="practica_gesto">Cero</string>
+    <string name="practica_gesto_descripcion">Con cualquiera de sus manos, deberá formar el número cero tocando su pulgar con los dedos índice, medio y anular</string>
+    <string name="practica_no_aprendida">¡Pruebe a realizar el gesto!\nObtenga una precisión del 90% o más</string>
+    <string name="practica_aprendida">Obtuvo una presición del 90% o más</string>
+
+    <string name="historial_gesto">Gesto: Cero</string>
+    <string name="historial_precision">Precisión: 0.9324</string>
+    <string name="historial_hora">10:32:42</string>
+
+    <string name="config_umbral_deteccion">Umbral de detección</string>
+    <string name="config_umbral_seguimiento">Umbral de seguimiento</string>
+    <string name="config_umbral_presencia">Umbral de presencia</string>
+    <string name="config_umbral_deteccion_valor">0.8</string>
+    <string name="config_umbral_seguimiento_valor">0.8</string>
+    <string name="config_umbral_presencia_valor">0.1</string>
+
+    <string name="calendario_evento_titulo">Tercera lección - Dactilogía</string>
+    <string name="calendario_evento_fecha">Sábado 4 de mayo</string>
+    <string name="calendario_evento_hora">10:30 - 11:00</string>
+    <string name="calendario_evento_duracion">30 min</string>
+    <string name="calendario_evento_tiempo">Tiempo</string>
+    <string name="calendario_evento_lecciones">Lecciones</string>
+    <string name="calendario_evento_aviso">Aviso</string>
+    <string name="calendario_evento_minutos_antes">10 min. antes</string>
+    <string name="calendario_evento_notas">Notas</string>
+    <string name="calendario_evento_notas_cuerpo">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod  tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim  veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea  commodo consequat. Duis aute irure dolor in reprehenderit in voluptate  velit esse cillum dolore eu fugiat nulla pariatur.</string>
+    <string-array name="menu_aviso">
+        <item>10 min</item>
+        <item>30 min</item>
+        <item>60 min</item>
+    </string-array>
+
+    <string name="perfil_nombre_completo">Manuel Alejandro Flores Caycho</string>
+    <string name="perfil_correo">a20190133@pucp.edu.pe</string>
+    <string name="perfil_frase">¡Comprometido con la inclusión!</string>
+    <string name="perfil_leccion_aprendida">Lección más reciente aprendida</string>
+    <string name="perfil_nombre_leccion_aprendida">Uno</string>
+    <string name="perfil_precision_leccion_aprendida">Precisión: 0.9324</string>
+    <string name="perfil_no_leccion_aprendida">Aún no ha aprendido una lección</string>
+    <string name="perfil_progreso">Progreso</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>
