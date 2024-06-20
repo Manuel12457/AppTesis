@@ -14,10 +14,10 @@ import android.widget.TextView;
 import android.window.OnBackInvokedDispatcher;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.apptesis.clases.Usuario;
 import com.example.apptesis.internet.NetworkChangeReceiver;
 import com.example.apptesis.internet.NetworkViewModel;
-import com.example.apptesis.widgets.HeaderViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -34,6 +34,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.apptesis.databinding.ActivityMainBinding;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Map;
 
@@ -41,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
-    private HeaderViewModel headerViewModel;
     private AlertDialog noConnectionDialog;
     private NetworkViewModel networkViewModel;
     private NetworkChangeReceiver networkChangeReceiver;
@@ -52,6 +55,17 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        setSupportActionBar(binding.appBarMain.toolbar);
+        DrawerLayout drawer = binding.drawerLayout;
+        NavigationView navigationView = binding.navView;
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+
+        Menu nav_Menu = navigationView.getMenu();
+        View headerView = navigationView.getHeaderView(0);
+        TextView navNombreUsuario = headerView.findViewById(R.id.nombreUsuario);
+        TextView navApellidoUsuario = headerView.findViewById(R.id.apellidoUsuario);
+        ImageView navFotoUsuario = headerView.findViewById(R.id.imageViewUsuario);
 
         // Diálogo de alerta: Verificación de internet
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -85,35 +99,31 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(networkChangeReceiver, filter);
         // Diálogo de alerta: Verificación de internet
 
-        setSupportActionBar(binding.appBarMain.toolbar);
-        DrawerLayout drawer = binding.drawerLayout;
-        NavigationView navigationView = binding.navView;
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+        FirebaseDatabase.getInstance().getReference("usuarios").orderByChild("usuario_id").equalTo(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            for (DataSnapshot ds : snapshot.getChildren()) {
+                                Usuario usuario = ds.getValue(Usuario.class);
+                                navNombreUsuario.setText(usuario.getNombre());
+                                navApellidoUsuario.setText(usuario.getApellido());
+                                for (Map.Entry<String, String> entry : usuario.getImagen().entrySet()) {
+                                    Glide.with(MainActivity.this)
+                                            .load(entry.getValue())
+                                            .into(navFotoUsuario);
+                                }
 
-        Menu nav_Menu = navigationView.getMenu();
-        View headerView = navigationView.getHeaderView(0);
-        TextView navNombreUsuario = headerView.findViewById(R.id.nombreUsuario);
-        TextView navApellidoUsuario = headerView.findViewById(R.id.apellidoUsuario);
-        ImageView navFotoUsuario = headerView.findViewById(R.id.imageViewUsuario);
-        headerViewModel = new ViewModelProvider(this).get(HeaderViewModel.class);
+                            }
 
-        headerViewModel.getUsuarioLiveData().observe(this, new Observer<Usuario>() {
-            @Override
-            public void onChanged(Usuario usuario) {
-                if (usuario != null) {
-                    navNombreUsuario.setText(usuario.getNombre());
-                    navApellidoUsuario.setText(usuario.getApellido());
-                    for (Map.Entry<String, String> entry : usuario.getImagen().entrySet()) {
-                        Glide.with(MainActivity.this)
-                                .load(entry.getValue())
-                                .into(navFotoUsuario);
+                        }
                     }
-                }
-            }
-        });
-        // Fetch user data
-        headerViewModel.fetchUsuarioData();
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_perfil, R.id.nav_calendario, R.id.nav_modo_libre, R.id.nav_practica)

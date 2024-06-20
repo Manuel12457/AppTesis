@@ -14,23 +14,45 @@ import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.apptesis.clases.Usuario;
 import com.example.apptesis.internet.NetworkChangeReceiver;
 import com.example.apptesis.internet.NetworkViewModel;
-import com.example.apptesis.widgets.RegistroUsuarioViewModel;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 import java.util.regex.Pattern;
 
 public class RegistroUsuario extends AppCompatActivity {
 
-    private RegistroUsuarioViewModel viewModel;
-    private MutableLiveData<Boolean> registroExitoso = new MutableLiveData<>();
-    private MutableLiveData<String> errorMensaje = new MutableLiveData<>();
+    FirebaseAuth firebaseAuth;
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
+    ValueEventListener valueEventListener;
+    ArrayList<String> listaCorreosRegistrados = new ArrayList<>();
+
     String id;
     HashMap<String, String> mapNombreArchivoUri = new HashMap<>();
 
@@ -49,11 +71,17 @@ public class RegistroUsuario extends AppCompatActivity {
     private NetworkViewModel networkViewModel;
     private NetworkChangeReceiver networkChangeReceiver;
 
+    LinearProgressIndicator linearProgressIndicator;
+    Button registerButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro_usuario);
         getSupportActionBar().setTitle("Registro de usuario");
+
+        linearProgressIndicator = findViewById(R.id.linearProgressIndicator);
+        registerButton = findViewById(R.id.btn_registrarseForm);
 
         mapNombreArchivoUri.put("321d159e-4d0a-48bd-ae4f-2b457cebae85", "https://firebasestorage.googleapis.com/v0/b/tesis-b2e20.appspot.com/o/img%2Fusuarios%2F321d159e-4d0a-48bd-ae4f-2b457cebae85.jpg?alt=media&token=427b5a76-df46-4fab-aeb7-7eaa2b3f6997");
         mapNombreArchivoUri.put("8616a378-b035-4014-a9ba-1e509f7d541f", "https://firebasestorage.googleapis.com/v0/b/tesis-b2e20.appspot.com/o/img%2Fusuarios%2F8616a378-b035-4014-a9ba-1e509f7d541f.jpg?alt=media&token=56e92831-970d-4cb1-a6f4-3029c3bb4796");
@@ -93,30 +121,11 @@ public class RegistroUsuario extends AppCompatActivity {
         registerReceiver(networkChangeReceiver, filter);
         // Diálogo de alerta: Verificación de internet
 
-        viewModel = new ViewModelProvider(this).get(RegistroUsuarioViewModel.class);
-        // Observa cambios en registroExitoso y errorMensaje
-        registroExitoso.observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean exito) {
-                if (exito) {
-                    Intent intent = new Intent(RegistroUsuario.this, Presentacion.class);
-                    intent.putExtra("exito", "¡Registro exitoso! Se ha enviado un correo para la verificación de su cuenta");
-                    startActivity(intent);
-                    finish();
-                }
-            }
-        });
 
-        errorMensaje.observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String mensaje) {
-                Toast.makeText(RegistroUsuario.this, mensaje, Toast.LENGTH_LONG).show();
-            }
-        });
-        //firebaseAuth = firebaseAuth.getInstance();
-        //firebaseDatabase = FirebaseDatabase.getInstance();
-        //databaseReference = firebaseDatabase.getReference("usuarios");
-        //valueEventListener = databaseReference.addValueEventListener(new listener());
+        firebaseAuth = firebaseAuth.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference("usuarios");
+        valueEventListener = databaseReference.addValueEventListener(new listener());
 
         TextInputLayout nombre = findViewById(R.id.inputNombre_registro);
         nombre.getEditText().addTextChangedListener(new TextWatcher() {
@@ -305,6 +314,10 @@ public class RegistroUsuario extends AppCompatActivity {
     }
 
     public void validarRegistro(View view) {
+
+        linearProgressIndicator.setVisibility(View.VISIBLE);
+        registerButton.setEnabled(false);
+
         TextInputLayout nombre = findViewById(R.id.inputNombre_registro);
         TextInputLayout apellido = findViewById(R.id.inputApellido_registro);
         TextInputLayout correo = findViewById(R.id.inputCorreo_registro);
@@ -368,16 +381,109 @@ public class RegistroUsuario extends AppCompatActivity {
 
         if (nombreValido && apellidoValido && correoValido && passwordValido && verifyPasswordValido) {
 
-            viewModel.registrarUsuario(
-                    nombre.getEditText().getText().toString(),
-                    apellido.getEditText().getText().toString(),
-                    correo.getEditText().getText().toString(),
-                    password.getEditText().getText().toString(),
-                    mapNombreArchivoUri,
-                    registroExitoso,
-                    errorMensaje
-            );
+            firebaseAuth.createUserWithEmailAndPassword(correo.getEditText().getText().toString(), password.getEditText().getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()) {
+                        Log.d("task", "EXITO EN REGISTRO");
 
+                        id = firebaseAuth.getCurrentUser().getUid();
+
+                        //Guardar usuario en db
+                        DatabaseReference databaseReference = firebaseDatabase.getReference().child("usuarios").child(firebaseAuth.getCurrentUser().getUid());
+                        Usuario usuario = new Usuario();
+                        usuario.setUsuario_id(id);
+                        usuario.setNombre(nombre.getEditText().getText().toString());
+                        usuario.setApellido(apellido.getEditText().getText().toString());
+                        usuario.setCorreo(correo.getEditText().getText().toString());
+                        databaseReference.setValue(usuario)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Log.d("registro", "USUARIO GUARDADO");
+
+                                        Random rand = new Random();
+                                        int randomNum = rand.nextInt((4 - 1) + 1) + 1;
+                                        int position = 1;
+                                        for (Map.Entry<String, String> entry : mapNombreArchivoUri.entrySet()) {
+                                            if (randomNum == position) {
+                                                DatabaseReference ref = firebaseDatabase.getReference().child("usuarios").child(id).child("imagen");
+                                                ref.child(entry.getKey()).setValue(entry.getValue())
+                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void unused) {
+
+                                                            }
+                                                        })
+                                                        .addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+
+                                                            }
+                                                        });
+                                            }
+                                            position++;
+                                        }
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        linearProgressIndicator.setVisibility(View.INVISIBLE);
+                                        registerButton.setEnabled(true);
+                                        Snackbar.make(findViewById(R.id.activity_registro_usuario), "Error: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
+                                    }
+                                });
+
+                        firebaseAuth.getCurrentUser().sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Log.d("task", "EXITO EN ENVIO DE CORREO DE VERIFICACION");
+                                Intent intent = new Intent(RegistroUsuario.this, Presentacion.class);
+                                intent.putExtra("exito", "Se ha enviado un correo para la verificación de su cuenta");
+                                startActivity(intent);
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                linearProgressIndicator.setVisibility(View.INVISIBLE);
+                                registerButton.setEnabled(true);
+                                Snackbar.make(findViewById(R.id.activity_registro_usuario), "Error: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
+                            }
+                        });
+
+                    } else {
+                        linearProgressIndicator.setVisibility(View.INVISIBLE);
+                        registerButton.setEnabled(true);
+                        Snackbar.make(findViewById(R.id.activity_registro_usuario), "Error: " + task.getException().getMessage(), Snackbar.LENGTH_LONG).show();
+                    }
+                }
+            });
+
+        } else {
+            linearProgressIndicator.setVisibility(View.INVISIBLE);
+            registerButton.setEnabled(true);
+        }
+    }
+
+    class listener implements ValueEventListener {
+
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+            if (snapshot.exists()) {
+                listaCorreosRegistrados.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Usuario usuario = ds.getValue(Usuario.class);
+                    listaCorreosRegistrados.add(usuario.getCorreo());
+                }
+            } else {
+                listaCorreosRegistrados.clear();
+            }
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+            Log.e("msg", "Error onCancelled", error.toException());
         }
     }
 

@@ -14,29 +14,38 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import com.example.apptesis.internet.NetworkChangeReceiver;
 import com.example.apptesis.internet.NetworkViewModel;
-import com.example.apptesis.widgets.CambioContraseniaViewModel;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class CambioContrasenia extends AppCompatActivity {
 
     boolean correoValido = true;
     int vecesCorreo = 0;
-    //FirebaseAuth firebaseAuth;
+
+    FirebaseAuth firebaseAuth;
     private AlertDialog noConnectionDialog;
     private NetworkViewModel networkViewModel;
     private NetworkChangeReceiver networkChangeReceiver;
 
-    private CambioContraseniaViewModel viewModel;
+    LinearProgressIndicator linearProgressIndicator;
+    Button changePswButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cambio_contrasenia);
         getSupportActionBar().setTitle("Cambio de contraseña");
+
+        linearProgressIndicator = findViewById(R.id.linearProgressIndicator);
+        changePswButton = findViewById(R.id.btn_enviarCorreo);
 
         // Diálogo de alerta: Verificación de internet
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -69,26 +78,6 @@ public class CambioContrasenia extends AppCompatActivity {
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(networkChangeReceiver, filter);
         // Diálogo de alerta: Verificación de internet
-
-        viewModel = new ViewModelProvider(this).get(CambioContraseniaViewModel.class);
-
-        // Observa el LiveData para cambios de éxito
-        viewModel.successLiveData.observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean success) {
-                if (success) {
-                    Snackbar.make(findViewById(R.id.activity_cambio_contrasenia), "Se le ha enviado un correo para proceder con la solicitud de cambio de contraseña", Snackbar.LENGTH_LONG).show();
-                }
-            }
-        });
-
-        // Observa el LiveData para errores
-        viewModel.errorLiveData.observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String error) {
-                Snackbar.make(findViewById(R.id.activity_cambio_contrasenia), "Ocurrió un error - " + error, Snackbar.LENGTH_LONG).show();
-            }
-        });
 
         TextInputLayout correo = findViewById(R.id.inputCorreo_cambioPsw);
         correo.getEditText().addTextChangedListener(new TextWatcher() {
@@ -126,11 +115,13 @@ public class CambioContrasenia extends AppCompatActivity {
             }
         });
 
-        //firebaseAuth = firebaseAuth.getInstance();
+        firebaseAuth = firebaseAuth.getInstance();
     }
 
     public void validarCorreo(View view) {
         TextInputLayout correo = findViewById(R.id.inputCorreo_cambioPsw);
+        linearProgressIndicator.setVisibility(View.VISIBLE);
+        changePswButton.setEnabled(false);
 
         String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z.]+";
         boolean correoValido = true;
@@ -151,7 +142,24 @@ public class CambioContrasenia extends AppCompatActivity {
         }
 
         if (correoValido) {
-            viewModel.sendPasswordResetEmail(correo.getEditText().getText().toString());
+            firebaseAuth.sendPasswordResetEmail(correo.getEditText().getText().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+                    //Esconder edittext y cambiar texto
+                    Log.d("forgetpsw", "Correo enviado para cambio de contrasenia");
+                    Snackbar.make(findViewById(R.id.activity_cambio_contrasenia), "Se le ha enviado un correo para proceder con la solicitud de cambio de contraseña", Snackbar.LENGTH_LONG).show();
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    linearProgressIndicator.setVisibility(View.INVISIBLE);
+                    changePswButton.setEnabled(true);
+                    Snackbar.make(findViewById(R.id.activity_cambio_contrasenia), "Error: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
+                }
+            });
+        } else {
+            linearProgressIndicator.setVisibility(View.INVISIBLE);
+            changePswButton.setEnabled(true);
         }
     }
 }
