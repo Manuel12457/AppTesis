@@ -18,14 +18,17 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.apptesis.clases.Usuario;
 import com.example.apptesis.internet.NetworkChangeReceiver;
 import com.example.apptesis.internet.NetworkViewModel;
+import com.example.apptesis.viewModels.UsuarioPerfilViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -43,6 +46,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
+    private UsuarioPerfilViewModel usuarioPerfilViewModel;
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
     private AlertDialog noConnectionDialog;
@@ -99,31 +103,26 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(networkChangeReceiver, filter);
         // Diálogo de alerta: Verificación de internet
 
-        FirebaseDatabase.getInstance().getReference("usuarios").orderByChild("usuario_id").equalTo(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            for (DataSnapshot ds : snapshot.getChildren()) {
-                                Usuario usuario = ds.getValue(Usuario.class);
-                                navNombreUsuario.setText(usuario.getNombre());
-                                navApellidoUsuario.setText(usuario.getApellido());
-                                for (Map.Entry<String, String> entry : usuario.getImagen().entrySet()) {
-                                    Glide.with(MainActivity.this)
-                                            .load(entry.getValue())
-                                            .into(navFotoUsuario);
-                                }
-
-                            }
-
-                        }
+        usuarioPerfilViewModel = new ViewModelProvider(this).get(UsuarioPerfilViewModel.class);
+        usuarioPerfilViewModel.getUserResult().observe(this, new Observer<UsuarioPerfilViewModel.UserResult>() {
+            @Override
+            public void onChanged(UsuarioPerfilViewModel.UserResult userResult) {
+                if (userResult.error != null) {
+                    // Handle the error
+                    Snackbar.make(findViewById(R.id.drawer_layout), userResult.error, Snackbar.LENGTH_LONG).show();
+                } else if (userResult.usuarios != null && !userResult.usuarios.isEmpty()) {
+                    Usuario usuario = userResult.usuarios.get(0);
+                    navNombreUsuario.setText(usuario.getNombre());
+                    navApellidoUsuario.setText(usuario.getApellido());
+                    for (Map.Entry<String, String> entry : usuario.getImagen().entrySet()) {
+                        Glide.with(MainActivity.this)
+                                .load(entry.getValue())
+                                .into(navFotoUsuario);
                     }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
+                }
+            }
+        });
+        usuarioPerfilViewModel.fetchUserData();
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_perfil, R.id.nav_calendario, R.id.nav_modo_libre, R.id.nav_practica)
@@ -132,6 +131,17 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
+            @Override
+            public void onDestinationChanged(@NonNull NavController navController, @NonNull NavDestination navDestination, @Nullable Bundle bundle) {
+                if (navDestination.getId() == R.id.nav_practica_leccion) {
+                    getSupportActionBar().setTitle("Lección");
+                } else if (navDestination.getId() == R.id.nav_practica_leccion_detalle) {
+                    getSupportActionBar().setTitle("Detalles de la lección");
+                }
+            }
+        });
 
         nav_Menu.findItem(R.id.sign_out).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -175,10 +185,10 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
-    @NonNull
+    /*@NonNull
     @Override
     public OnBackInvokedDispatcher getOnBackInvokedDispatcher() {
         moveTaskToBack(true);
         return super.getOnBackInvokedDispatcher();
-    }
+    }*/
 }

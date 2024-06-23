@@ -27,5 +27,24 @@
         android:id="@+id/nav_practica"
         android:name="com.example.apptesis.fragments.nav_practica"
         android:label="@string/menu_practica"
-        tools:layout="@layout/fragment_nav_practica" />
+        tools:layout="@layout/fragment_nav_practica">
+        <action
+            android:id="@+id/action_nav_practica_to_nav_practica_leccion"
+            app:destination="@id/nav_practica_leccion" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_practica_leccion"
+        android:name="com.example.apptesis.fragments.nav_practica_leccion"
+        android:label="fragment_nav_practica_leccion"
+        tools:layout="@layout/fragment_nav_practica_leccion" >
+        <action
+            android:id="@+id/action_nav_practica_leccion_to_nav_practica_leccion_detalle"
+            app:destination="@id/nav_practica_leccion_detalle" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_practica_leccion_detalle"
+        android:name="com.example.apptesis.fragments.nav_practica_leccion_detalle"
+        android:label="fragment_nav_practica_leccion_detalle"
+        tools:layout="@layout/fragment_nav_practica_leccion_detalle" />
+
 </navigation>

@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.example.apptesis.clases.Usuario;
 import com.example.apptesis.internet.NetworkChangeReceiver;
 import com.example.apptesis.internet.NetworkViewModel;
+import com.example.apptesis.viewModels.RegistroUsuarioViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -47,12 +48,11 @@ import java.util.regex.Pattern;
 
 public class RegistroUsuario extends AppCompatActivity {
 
-    FirebaseAuth firebaseAuth;
-    FirebaseDatabase firebaseDatabase;
-    DatabaseReference databaseReference;
-    ValueEventListener valueEventListener;
-    ArrayList<String> listaCorreosRegistrados = new ArrayList<>();
-
+    //FirebaseAuth firebaseAuth;
+    //FirebaseDatabase firebaseDatabase;
+    //DatabaseReference databaseReference;
+    //ValueEventListener valueEventListener;
+    private RegistroUsuarioViewModel registroUsuarioViewModel;
     String id;
     HashMap<String, String> mapNombreArchivoUri = new HashMap<>();
 
@@ -122,10 +122,26 @@ public class RegistroUsuario extends AppCompatActivity {
         // Diálogo de alerta: Verificación de internet
 
 
-        firebaseAuth = firebaseAuth.getInstance();
-        firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference("usuarios");
-        valueEventListener = databaseReference.addValueEventListener(new listener());
+        //firebaseAuth = firebaseAuth.getInstance();
+        //firebaseDatabase = FirebaseDatabase.getInstance();
+        //databaseReference = firebaseDatabase.getReference("usuarios");
+        //valueEventListener = databaseReference.addValueEventListener(new listener());
+        registroUsuarioViewModel = new ViewModelProvider(this).get(RegistroUsuarioViewModel.class);
+        registroUsuarioViewModel.getRegisterResult().observe(this, new Observer<RegistroUsuarioViewModel.RegisterResult>() {
+            @Override
+            public void onChanged(RegistroUsuarioViewModel.RegisterResult registerResult) {
+                linearProgressIndicator.setVisibility(View.INVISIBLE);
+                registerButton.setEnabled(true);
+
+                if (registerResult.success) {
+                    Intent intent = new Intent(RegistroUsuario.this, Presentacion.class);
+                    intent.putExtra("exito", registerResult.message);
+                    startActivity(intent);
+                } else {
+                    Snackbar.make(findViewById(R.id.activity_registro_usuario), registerResult.message, Snackbar.LENGTH_LONG).show();
+                }
+            }
+        });
 
         TextInputLayout nombre = findViewById(R.id.inputNombre_registro);
         nombre.getEditText().addTextChangedListener(new TextWatcher() {
@@ -380,110 +396,12 @@ public class RegistroUsuario extends AppCompatActivity {
         }
 
         if (nombreValido && apellidoValido && correoValido && passwordValido && verifyPasswordValido) {
-
-            firebaseAuth.createUserWithEmailAndPassword(correo.getEditText().getText().toString(), password.getEditText().getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        Log.d("task", "EXITO EN REGISTRO");
-
-                        id = firebaseAuth.getCurrentUser().getUid();
-
-                        //Guardar usuario en db
-                        DatabaseReference databaseReference = firebaseDatabase.getReference().child("usuarios").child(firebaseAuth.getCurrentUser().getUid());
-                        Usuario usuario = new Usuario();
-                        usuario.setUsuario_id(id);
-                        usuario.setNombre(nombre.getEditText().getText().toString());
-                        usuario.setApellido(apellido.getEditText().getText().toString());
-                        usuario.setCorreo(correo.getEditText().getText().toString());
-                        databaseReference.setValue(usuario)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Log.d("registro", "USUARIO GUARDADO");
-
-                                        Random rand = new Random();
-                                        int randomNum = rand.nextInt((4 - 1) + 1) + 1;
-                                        int position = 1;
-                                        for (Map.Entry<String, String> entry : mapNombreArchivoUri.entrySet()) {
-                                            if (randomNum == position) {
-                                                DatabaseReference ref = firebaseDatabase.getReference().child("usuarios").child(id).child("imagen");
-                                                ref.child(entry.getKey()).setValue(entry.getValue())
-                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void unused) {
-
-                                                            }
-                                                        })
-                                                        .addOnFailureListener(new OnFailureListener() {
-                                                            @Override
-                                                            public void onFailure(@NonNull Exception e) {
-
-                                                            }
-                                                        });
-                                            }
-                                            position++;
-                                        }
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        linearProgressIndicator.setVisibility(View.INVISIBLE);
-                                        registerButton.setEnabled(true);
-                                        Snackbar.make(findViewById(R.id.activity_registro_usuario), "Error: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
-                                    }
-                                });
-
-                        firebaseAuth.getCurrentUser().sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
-                                Log.d("task", "EXITO EN ENVIO DE CORREO DE VERIFICACION");
-                                Intent intent = new Intent(RegistroUsuario.this, Presentacion.class);
-                                intent.putExtra("exito", "Se ha enviado un correo para la verificación de su cuenta");
-                                startActivity(intent);
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                linearProgressIndicator.setVisibility(View.INVISIBLE);
-                                registerButton.setEnabled(true);
-                                Snackbar.make(findViewById(R.id.activity_registro_usuario), "Error: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
-                            }
-                        });
-
-                    } else {
-                        linearProgressIndicator.setVisibility(View.INVISIBLE);
-                        registerButton.setEnabled(true);
-                        Snackbar.make(findViewById(R.id.activity_registro_usuario), "Error: " + task.getException().getMessage(), Snackbar.LENGTH_LONG).show();
-                    }
-                }
-            });
-
+            linearProgressIndicator.setVisibility(View.VISIBLE);
+            registerButton.setEnabled(false);
+            registroUsuarioViewModel.registerUser(correo.getEditText().getText().toString(), password.getEditText().getText().toString(), nombre.getEditText().getText().toString(), apellido.getEditText().getText().toString(), mapNombreArchivoUri);
         } else {
             linearProgressIndicator.setVisibility(View.INVISIBLE);
             registerButton.setEnabled(true);
-        }
-    }
-
-    class listener implements ValueEventListener {
-
-        @Override
-        public void onDataChange(@NonNull DataSnapshot snapshot) {
-            if (snapshot.exists()) {
-                listaCorreosRegistrados.clear();
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    Usuario usuario = ds.getValue(Usuario.class);
-                    listaCorreosRegistrados.add(usuario.getCorreo());
-                }
-            } else {
-                listaCorreosRegistrados.clear();
-            }
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError error) {
-            Log.e("msg", "Error onCancelled", error.toException());
         }
     }
 

@@ -18,6 +18,7 @@ import android.widget.Button;
 
 import com.example.apptesis.internet.NetworkChangeReceiver;
 import com.example.apptesis.internet.NetworkViewModel;
+import com.example.apptesis.viewModels.CambioContraseniaViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
@@ -27,10 +28,11 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class CambioContrasenia extends AppCompatActivity {
 
+    private CambioContraseniaViewModel cambioContraseniaViewModel;
     boolean correoValido = true;
     int vecesCorreo = 0;
 
-    FirebaseAuth firebaseAuth;
+    //FirebaseAuth firebaseAuth;
     private AlertDialog noConnectionDialog;
     private NetworkViewModel networkViewModel;
     private NetworkChangeReceiver networkChangeReceiver;
@@ -115,7 +117,26 @@ public class CambioContrasenia extends AppCompatActivity {
             }
         });
 
-        firebaseAuth = firebaseAuth.getInstance();
+        cambioContraseniaViewModel = new ViewModelProvider(this).get(CambioContraseniaViewModel.class);
+        cambioContraseniaViewModel.getPasswordResetResult().observe(this, new Observer<CambioContraseniaViewModel.PasswordResetResult>() {
+            @Override
+            public void onChanged(CambioContraseniaViewModel.PasswordResetResult passwordResetResult) {
+
+                if (passwordResetResult.success) {
+                    // Esconder edittext y cambiar texto
+                    linearProgressIndicator.setVisibility(View.INVISIBLE);
+                    changePswButton.setEnabled(true);
+                    Log.d("forgetpsw", passwordResetResult.message);
+                    Snackbar.make(findViewById(R.id.activity_cambio_contrasenia), "Se le ha enviado un correo para proceder con la solicitud de cambio de contraseña", Snackbar.LENGTH_LONG).show();
+                } else {
+                    linearProgressIndicator.setVisibility(View.INVISIBLE);
+                    changePswButton.setEnabled(true);
+                    Snackbar.make(findViewById(R.id.activity_cambio_contrasenia), "Error: " + passwordResetResult.message, Snackbar.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        //firebaseAuth = firebaseAuth.getInstance();
     }
 
     public void validarCorreo(View view) {
@@ -142,21 +163,9 @@ public class CambioContrasenia extends AppCompatActivity {
         }
 
         if (correoValido) {
-            firebaseAuth.sendPasswordResetEmail(correo.getEditText().getText().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void unused) {
-                    //Esconder edittext y cambiar texto
-                    Log.d("forgetpsw", "Correo enviado para cambio de contrasenia");
-                    Snackbar.make(findViewById(R.id.activity_cambio_contrasenia), "Se le ha enviado un correo para proceder con la solicitud de cambio de contraseña", Snackbar.LENGTH_LONG).show();
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    linearProgressIndicator.setVisibility(View.INVISIBLE);
-                    changePswButton.setEnabled(true);
-                    Snackbar.make(findViewById(R.id.activity_cambio_contrasenia), "Error: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
-                }
-            });
+            linearProgressIndicator.setVisibility(View.VISIBLE);
+            changePswButton.setEnabled(false);
+            cambioContraseniaViewModel.sendPasswordResetEmail(correo.getEditText().getText().toString());
         } else {
             linearProgressIndicator.setVisibility(View.INVISIBLE);
             changePswButton.setEnabled(true);

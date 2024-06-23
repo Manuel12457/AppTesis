@@ -69,6 +69,7 @@
     <string name="perfil_leccion_aprendida">Lección más reciente aprendida</string>
     <string name="perfil_nombre_leccion_aprendida">Uno</string>
     <string name="perfil_precision_leccion_aprendida">Precisión: 0.9324</string>
+    <string name="perfil_progreso_leccion_aprendido">Aprendido</string>
     <string name="perfil_no_leccion_aprendida">Aún no ha aprendido una lección</string>
     <string name="perfil_progreso">Progreso</string>
     <!-- TODO: Remove or change this placeholder text -->

@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 
 import com.example.apptesis.internet.NetworkChangeReceiver;
 import com.example.apptesis.internet.NetworkViewModel;
+import com.example.apptesis.viewModels.InicioSesionViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
@@ -35,7 +36,8 @@ import java.util.regex.Pattern;
 
 public class InicioSesion extends AppCompatActivity {
 
-    FirebaseAuth firebaseAuth;
+    //FirebaseAuth firebaseAuth;
+    private InicioSesionViewModel inicioSesionViewModel;
     private AlertDialog noConnectionDialog;
     private NetworkViewModel networkViewModel;
     private NetworkChangeReceiver networkChangeReceiver;
@@ -175,7 +177,23 @@ public class InicioSesion extends AppCompatActivity {
             }
         });
 
-        firebaseAuth = firebaseAuth.getInstance();
+        inicioSesionViewModel = new ViewModelProvider(this).get(InicioSesionViewModel.class);
+        inicioSesionViewModel.getLoginResult().observe(this, new Observer<InicioSesionViewModel.LoginResult>() {
+            @Override
+            public void onChanged(InicioSesionViewModel.LoginResult loginResult) {
+                if (loginResult.success) {
+                    Intent intent = new Intent(InicioSesion.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    linearProgressIndicator.setVisibility(View.INVISIBLE);
+                    iniSessionButton.setEnabled(true);
+                    changePswButton.setEnabled(true);
+                    Snackbar.make(findViewById(R.id.activity_inicio_sesion), "Error: " + loginResult.message, Snackbar.LENGTH_LONG).show();
+                }
+            }
+        });
+        //firebaseAuth = firebaseAuth.getInstance();
     }
 
     public void cambiarContrasenia(View view){
@@ -220,118 +238,10 @@ public class InicioSesion extends AppCompatActivity {
         }
 
         if (correoValido && passwordValido) {
-            /*firebaseAuth.signInWithEmailAndPassword(correo.getEditText().getText().toString(), password.getEditText().getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        Log.d("task", "EXITO EN REGISTRO");
-
-                        firebaseAuth.getCurrentUser().reload().addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (firebaseAuth.getCurrentUser().isEmailVerified()) {
-                                    Log.d("task", "EMAIL VERIFIED");
-                                    FirebaseDatabase.getInstance().getReference("usuarios").orderByChild("id").equalTo(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                    if (snapshot.exists()) {
-                                                        Log.d("task", "SNAPSHOT EXISTS");
-                                                        Intent intent = new Intent(InicioSesion.this, MainActivity.class);
-                                                        startActivity(intent);
-                                                        finish();
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError error) {
-                                                    Log.d("task", "DATABASE ERROR");
-                                                    linearProgressIndicator.setVisibility(View.INVISIBLE);
-                                                    iniSessionButton.setEnabled(true);
-                                                    changePswButton.setEnabled(true);
-                                                    Snackbar.make(findViewById(R.id.activity_inicio_sesion), "Error: " + error.toString(), Snackbar.LENGTH_LONG).show();
-                                                }
-                                            });
-                                } else {
-                                    linearProgressIndicator.setVisibility(View.INVISIBLE);
-                                    iniSessionButton.setEnabled(true);
-                                    changePswButton.setEnabled(true);
-                                    Snackbar.make(findViewById(R.id.activity_inicio_sesion), "Su cuenta no ha sido verificada. Verifíquela para poder ingresar", Snackbar.LENGTH_LONG).show();
-                                }
-                            }
-                        });
-                    } else {
-                        linearProgressIndicator.setVisibility(View.INVISIBLE);
-                        iniSessionButton.setEnabled(true);
-                        changePswButton.setEnabled(true);
-                        Log.d("task", "ERROR EN REGISTRO - " + task.getException().getMessage());
-                        //Ver bien mensaje de error
-                        Snackbar.make(findViewById(R.id.activity_inicio_sesion), task.getException().getMessage(), Snackbar.LENGTH_LONG).show();
-                    }
-                }
-            });*/
-            firebaseAuth.signInWithEmailAndPassword(correo.getEditText().getText().toString(), password.getEditText().getText().toString())
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                Log.d("task", "EXITO EN REGISTRO");
-
-                                firebaseAuth.getCurrentUser().reload().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (firebaseAuth.getCurrentUser().isEmailVerified()) {
-                                            Log.d("task", "EMAIL VERIFIED");
-
-                                            FirebaseDatabase.getInstance().getReference("usuarios")
-                                                    .orderByChild("usuario_id")
-                                                    .equalTo(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                            if (snapshot.exists()) {
-                                                                Log.d("task", "SNAPSHOT EXISTS");
-                                                                Intent intent = new Intent(InicioSesion.this, MainActivity.class);
-                                                                startActivity(intent);
-                                                                finish();
-                                                            } else {
-                                                                Log.d("task", "SNAPSHOT DOES NOT EXIST");
-                                                                linearProgressIndicator.setVisibility(View.INVISIBLE);
-                                                                iniSessionButton.setEnabled(true);
-                                                                changePswButton.setEnabled(true);
-                                                                Snackbar.make(findViewById(R.id.activity_inicio_sesion), "Usuario no encontrado en la base de datos.", Snackbar.LENGTH_LONG).show();
-                                                            }
-                                                        }
-
-                                                        @Override
-                                                        public void onCancelled(@NonNull DatabaseError error) {
-                                                            Log.d("task", "DATABASE ERROR: " + error.getMessage());
-                                                            linearProgressIndicator.setVisibility(View.INVISIBLE);
-                                                            iniSessionButton.setEnabled(true);
-                                                            changePswButton.setEnabled(true);
-                                                            Snackbar.make(findViewById(R.id.activity_inicio_sesion), "Error: " + error.getMessage(), Snackbar.LENGTH_LONG).show();
-                                                        }
-                                                    });
-                                        } else {
-                                            Log.d("task", "EMAIL NOT VERIFIED");
-                                            linearProgressIndicator.setVisibility(View.INVISIBLE);
-                                            iniSessionButton.setEnabled(true);
-                                            changePswButton.setEnabled(true);
-                                            Snackbar.make(findViewById(R.id.activity_inicio_sesion), "Su cuenta no ha sido verificada. Verifíquela para poder ingresar", Snackbar.LENGTH_LONG).show();
-                                        }
-                                    }
-                                });
-                            } else {
-                                linearProgressIndicator.setVisibility(View.INVISIBLE);
-                                iniSessionButton.setEnabled(true);
-                                changePswButton.setEnabled(true);
-                                Log.d("task", "ERROR EN REGISTRO - " + task.getException().getMessage());
-                                Snackbar.make(findViewById(R.id.activity_inicio_sesion), task.getException().getMessage(), Snackbar.LENGTH_LONG).show();
-                            }
-                        }
-                    });
-
-
+            linearProgressIndicator.setVisibility(View.VISIBLE);
+            iniSessionButton.setEnabled(false);
+            changePswButton.setEnabled(false);
+            inicioSesionViewModel.login(correo.getEditText().getText().toString(), password.getEditText().getText().toString());
         } else {
             linearProgressIndicator.setVisibility(View.INVISIBLE);
             iniSessionButton.setEnabled(true);

@@ -5,10 +5,28 @@ import java.util.Map;
 public class ProgresoUsuario {
 
     private String progreso_usuario_id;
-    private String catgoria_id;
+    private String usuario_id;
+    private String categoria_id;
+
+    public String getCategoria_id() {
+        return categoria_id;
+    }
+
+    public void setCategoria_id(String categoria_id) {
+        this.categoria_id = categoria_id;
+    }
+
     private String leccion_id;
     private String fecha_hora;
     private String porcentaje;
+
+    public String getUsuario_id() {
+        return usuario_id;
+    }
+
+    public void setUsuario_id(String usuario_id) {
+        this.usuario_id = usuario_id;
+    }
 
     public String getProgreso_usuario_id() {
         return progreso_usuario_id;
@@ -16,14 +34,6 @@ public class ProgresoUsuario {
 
     public void setProgreso_usuario_id(String progreso_usuario_id) {
         this.progreso_usuario_id = progreso_usuario_id;
-    }
-
-    public String getCatgoria_id() {
-        return catgoria_id;
-    }
-
-    public void setCatgoria_id(String catgoria_id) {
-        this.catgoria_id = catgoria_id;
     }
 
     public String getLeccion_id() {

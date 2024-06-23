@@ -1,66 +1,121 @@
 package com.example.apptesis.fragments;
 
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.example.apptesis.MainActivity;
 import com.example.apptesis.R;
+import com.example.apptesis.adapters.ListaCategoriasAdapter;
+import com.example.apptesis.clases.Categoria;
+import com.example.apptesis.clases.Leccion;
+import com.example.apptesis.clases.ProgresoUsuario;
+import com.example.apptesis.clases.Usuario;
+import com.example.apptesis.databinding.FragmentNavPracticaBinding;
+import com.example.apptesis.databinding.FragmentNavPracticaLeccionDetalleBinding;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link nav_practica_leccion_detalle#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.Map;
+
 public class nav_practica_leccion_detalle extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public nav_practica_leccion_detalle() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment nav_practica_leccion_detalle.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static nav_practica_leccion_detalle newInstance(String param1, String param2) {
-        nav_practica_leccion_detalle fragment = new nav_practica_leccion_detalle();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    DatabaseReference databaseReference;
+    ValueEventListener valueEventListener;
+    RecyclerView recyclerView;
+    ArrayList<Leccion> listaLecciones = new ArrayList<>();
+    ArrayList<ProgresoUsuario> listaProgreso = new ArrayList<>();
+    private FragmentNavPracticaLeccionDetalleBinding binding;
+    String leccion_id;
+    String categoria_id;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_nav_practica_leccion_detalle, container, false);
+        binding = FragmentNavPracticaLeccionDetalleBinding.inflate(inflater, container, false);
+        View view = binding.getRoot();
+
+        Bundle bundle = this.getArguments();
+        leccion_id = bundle.getString("leccion_id");
+        categoria_id = bundle.getString("categoria_id");
+
+        TextView navTituloLeccion = view.findViewById(R.id.idTitulo);
+        ImageView navImagenUsuario = view.findViewById(R.id.idImagenLeccion);
+        TextView navDescripcionLeccion = view.findViewById(R.id.idDescripcionLeccion);
+        FloatingActionButton navCompletado = view.findViewById(R.id.floatingActionButton);
+        TextView navCompletadoLeccion = view.findViewById(R.id.idCompletadoLeccion);
+
+        FirebaseDatabase.getInstance().getReference("categorias").child(categoria_id).child("lecciones").orderByChild("leccion_id").equalTo(leccion_id)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            for (DataSnapshot ds : snapshot.getChildren()) {
+                                Leccion leccion = ds.getValue(Leccion.class);
+                                navTituloLeccion.setText(leccion.getTitulo());
+                                navDescripcionLeccion.setText(leccion.getDescripcion());
+                                for (Map.Entry<String, String> entry : leccion.getImagen().entrySet()) {
+                                    Glide.with(getActivity().findViewById(android.R.id.content))
+                                            .load(entry.getValue())
+                                            .into(navImagenUsuario);
+                                }
+                            }
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+        FirebaseDatabase.getInstance().getReference("progreso_usuarios").orderByChild("usuario_id").equalTo(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            for (DataSnapshot ds : snapshot.getChildren()) {
+                                ProgresoUsuario progresoUsuario = ds.getValue(ProgresoUsuario.class);
+                                navCompletado.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.button_completed)));
+                                navCompletado.setImageResource(R.drawable.baseline_check_white_24);
+                                navCompletadoLeccion.setText(R.string.practica_aprendida);
+                            }
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+
+        return view;
     }
+
 }

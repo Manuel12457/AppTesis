@@ -9,7 +9,15 @@ public class Categoria {
     private String categoria;
     private String descripcion;
     private Map<String, String> imagen;
-    private ArrayList<Leccion> listaLecciones;
+    private Map<String, Leccion> lecciones;
+
+    public Map<String, Leccion> getLecciones() {
+        return lecciones;
+    }
+
+    public void setLecciones(Map<String, Leccion> lecciones) {
+        this.lecciones = lecciones;
+    }
 
     public String getCategoria_id() {
         return categoria_id;
@@ -43,11 +51,4 @@ public class Categoria {
         this.imagen = imagen;
     }
 
-    public ArrayList<Leccion> getListaLecciones() {
-        return listaLecciones;
-    }
-
-    public void setListaLecciones(ArrayList<Leccion> listaLecciones) {
-        this.listaLecciones = listaLecciones;
-    }
 }
