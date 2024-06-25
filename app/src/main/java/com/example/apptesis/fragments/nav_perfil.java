@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -35,6 +36,7 @@ import com.example.apptesis.databinding.FragmentNavPerfilBinding;
 import com.example.apptesis.viewModels.ListaCategoriasViewModel;
 import com.example.apptesis.viewModels.ListaProgresoUsuarioViewModel;
 import com.example.apptesis.viewModels.UsuarioPerfilViewModel;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -44,16 +46,19 @@ import java.util.Map;
 public class nav_perfil extends Fragment {
 
     private UsuarioPerfilViewModel usuarioPerfilViewModel;
-    ListaCategoriasViewModel listaCategoriasViewModel;
-    ListaProgresoUsuarioViewModel listaProgresoUsuarioViewModel;
-    ArrayList<ProgresoUsuario> listaProgreso = new ArrayList<>();
-    ArrayList<Categoria> listaCategoria = new ArrayList<>();
-    RecyclerView recyclerView;
-    ListaCategoriasProgresoAdapter listaCategoriasProgresoAdapter;
+    private ListaCategoriasViewModel listaCategoriasViewModel;
+    private ListaProgresoUsuarioViewModel listaProgresoUsuarioViewModel;
+    private ArrayList<ProgresoUsuario> listaProgreso = new ArrayList<>();
+    private ArrayList<Categoria> listaCategoria = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private ListaCategoriasProgresoAdapter listaCategoriasProgresoAdapter;
     private FragmentNavPerfilBinding binding;
     private TextView myTextView_nombre_completo;
     private TextView myTextView_correo;
     private TextView myTextView_frase;
+    LinearProgressIndicator linearProgressIndicator;
+    ScrollView scrollView;
+
     private BroadcastReceiver uiModeChangedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -61,13 +66,11 @@ public class nav_perfil extends Fragment {
                 int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
                 switch (currentNightMode) {
                     case Configuration.UI_MODE_NIGHT_NO:
-                        // Light mode
                         myTextView_nombre_completo.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white));
                         myTextView_correo.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white));
                         myTextView_frase.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white));
                         break;
                     case Configuration.UI_MODE_NIGHT_YES:
-                        // Dark mode
                         myTextView_nombre_completo.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black));
                         myTextView_correo.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black));
                         myTextView_frase.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black));
@@ -78,39 +81,42 @@ public class nav_perfil extends Fragment {
     };
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentNavPerfilBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
         myTextView_nombre_completo = view.findViewById(R.id.textView_perfil_nombre_completo);
         myTextView_correo = view.findViewById(R.id.textView_perfil_correo);
-        myTextView_frase= view.findViewById(R.id.textView_perfil_frase);
-        // Set initial text color based on current UI mode
+        myTextView_frase = view.findViewById(R.id.textView_perfil_frase);
+        linearProgressIndicator = view.findViewById(R.id.linearProgressIndicator);
+        scrollView = view.findViewById(R.id.scrollviewPerfil);
+
         int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-        switch (currentNightMode) {
-            case Configuration.UI_MODE_NIGHT_NO:
-                myTextView_nombre_completo.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
-                myTextView_correo.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
-                myTextView_frase.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
-                break;
-            case Configuration.UI_MODE_NIGHT_YES:
-                myTextView_nombre_completo.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
-                myTextView_correo.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
-                myTextView_frase.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
-                break;
-        }
+        // Verifica si las vistas son nulas
+        if (myTextView_nombre_completo != null || myTextView_correo != null || myTextView_frase != null) {
+            switch (currentNightMode) {
+                case Configuration.UI_MODE_NIGHT_NO:
+                    myTextView_nombre_completo.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
+                    myTextView_correo.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
+                    myTextView_frase.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
+                    break;
+                case Configuration.UI_MODE_NIGHT_YES:
+                    myTextView_nombre_completo.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
+                    myTextView_correo.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
+                    myTextView_frase.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
+                    break;
+            }
+        };
 
         TextView navNombreCompletoUsuario = view.findViewById(R.id.textView_perfil_nombre_completo);
         TextView navCorreoUsuario = view.findViewById(R.id.textView_perfil_correo);
         ImageView navImagenUsuario = view.findViewById(R.id.imageViewUsuario);
+
         usuarioPerfilViewModel = new ViewModelProvider(this).get(UsuarioPerfilViewModel.class);
         usuarioPerfilViewModel.getUserResult().observe(getViewLifecycleOwner(), new Observer<UsuarioPerfilViewModel.UserResult>() {
             @Override
             public void onChanged(UsuarioPerfilViewModel.UserResult userResult) {
                 if (userResult.error != null) {
-                    // Handle the error
                     Snackbar.make(getActivity().findViewById(android.R.id.content), userResult.error, Snackbar.LENGTH_LONG).show();
                 } else if (userResult.usuarios != null && !userResult.usuarios.isEmpty()) {
                     Usuario usuario = userResult.usuarios.get(0);
@@ -121,53 +127,45 @@ public class nav_perfil extends Fragment {
                                 .load(entry.getValue())
                                 .into(navImagenUsuario);
                     }
-                    }
+
+                    linearProgressIndicator.setVisibility(View.INVISIBLE);
+                    scrollView.setVisibility(View.VISIBLE);
                 }
             }
-        );
+        });
         usuarioPerfilViewModel.fetchUserData();
 
         listaCategoriasViewModel = new ViewModelProvider(this).get(ListaCategoriasViewModel.class);
-
         listaCategoriasViewModel.getCategoryResult().observe(getViewLifecycleOwner(), new Observer<ListaCategoriasViewModel.CategoryResult>() {
             @Override
             public void onChanged(ListaCategoriasViewModel.CategoryResult categoryResult) {
                 if (categoryResult.error != null) {
-                    // Handle the error
                     Log.d("ESTADO listaCategoria", categoryResult.error);
                     Snackbar.make(view, categoryResult.error, Snackbar.LENGTH_LONG).show();
                 } else {
                     listaCategoria.clear();
                     listaCategoria.addAll(categoryResult.categorias);
-                    // Update your UI here with the new list of categories
+                    listaCategoriasProgresoAdapter.notifyDataSetChanged(); // Actualiza el RecyclerView
                 }
             }
         });
-
-        // Fetch categories
         listaCategoriasViewModel.fetchCategories();
-        Log.d("TAMANIO listaCategoria", String.valueOf(listaCategoria.size()));
 
         listaProgresoUsuarioViewModel = new ViewModelProvider(this).get(ListaProgresoUsuarioViewModel.class);
-
         listaProgresoUsuarioViewModel.getProgresoResult().observe(getViewLifecycleOwner(), new Observer<ListaProgresoUsuarioViewModel.ProgresoResult>() {
             @Override
             public void onChanged(ListaProgresoUsuarioViewModel.ProgresoResult progresoResult) {
                 if (progresoResult.error != null) {
-                    // Handle the error
                     Log.d("ESTADO listaProgreso", progresoResult.error);
                     Snackbar.make(view, progresoResult.error, Snackbar.LENGTH_LONG).show();
                 } else {
                     listaProgreso.clear();
                     listaProgreso.addAll(progresoResult.progresoUsuarios);
-                    // Update your UI here with the new list of progress data
+                    listaCategoriasProgresoAdapter.notifyDataSetChanged(); // Actualiza el RecyclerView
                 }
             }
         });
-
-        // Fetch progreso usuarios
         listaProgresoUsuarioViewModel.fetchProgresoUsuarios();
-        Log.d("TAMANIO listaProgreso", String.valueOf(listaProgreso.size()));
 
         recyclerView = view.findViewById(R.id.idRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -188,7 +186,7 @@ public class nav_perfil extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // Unregister BroadcastReceiver when fragment is destroyed
         requireContext().unregisterReceiver(uiModeChangedReceiver);
     }
+
 }

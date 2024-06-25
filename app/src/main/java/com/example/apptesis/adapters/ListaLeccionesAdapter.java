@@ -79,9 +79,11 @@ public class ListaLeccionesAdapter extends RecyclerView.Adapter<ListaLeccionesAd
     public void onBindViewHolder(@NonNull ListaLeccionesAdapter.LeccionesViewHolder holder, int position) {
         Leccion leccion = getListaLecciones().get(position);
         holder.leccion.setText(leccion.getTitulo());
+        boolean aprendido = false;
 
         for (ProgresoUsuario p : listaProgreso) {
             if (p.getLeccion_id().equalsIgnoreCase(leccion.getLeccion_id())) {
+                aprendido = true;
                 holder.linearCompletado.setVisibility(View.VISIBLE);
                 holder.porcentaje.setText("Precisión: " + p.getPorcentaje());
             }
@@ -96,12 +98,14 @@ public class ListaLeccionesAdapter extends RecyclerView.Adapter<ListaLeccionesAd
             }
         }
 
+        boolean finalAprendido = aprendido;
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putString("leccion_id", leccion.getLeccion_id());
                 bundle.putString("categoria_id", categoria_id);
+                bundle.putString("aprendido", String.valueOf(finalAprendido));
                 Navigation.findNavController(v).navigate(R.id.nav_practica_leccion_detalle, bundle);
             }
         });

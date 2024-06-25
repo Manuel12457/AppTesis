@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -11,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.apptesis.R;
 import com.example.apptesis.adapters.ListaCategoriasAdapter;
@@ -20,6 +23,10 @@ import com.example.apptesis.clases.Leccion;
 import com.example.apptesis.clases.ProgresoUsuario;
 import com.example.apptesis.databinding.FragmentNavPracticaBinding;
 import com.example.apptesis.databinding.FragmentNavPracticaLeccionBinding;
+import com.example.apptesis.viewModels.ListaCategoriasViewModel;
+import com.example.apptesis.viewModels.ListaLeccionesViewModel;
+import com.example.apptesis.viewModels.ListaProgresoUsuarioViewModel;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -33,14 +40,16 @@ import java.util.ArrayList;
 
 public class nav_practica_leccion extends Fragment {
 
-    Query query;
-    DatabaseReference databaseReference;
-    ListaLeccionesAdapter adapter;
-    ValueEventListener valueEventListener;
+    ListaProgresoUsuarioViewModel listaProgresoUsuarioViewModel;
+    ListaLeccionesViewModel listaLeccionesViewModel;
     RecyclerView recyclerView;
-    ArrayList<Leccion> listaLecciones = new ArrayList<>();;
-    ArrayList<ProgresoUsuario> listaProgreso = new ArrayList<>();;
+    ListaLeccionesAdapter adapter;
+    ArrayList<Leccion> listaLecciones = new ArrayList<>();
+    ArrayList<ProgresoUsuario> listaProgreso = new ArrayList<>();
     String categoria_id;
+    String categoria;
+    TextView textView;
+    LinearProgressIndicator linearProgressIndicator;
     private FragmentNavPracticaLeccionBinding binding;
 
     @Override
@@ -49,78 +58,67 @@ public class nav_practica_leccion extends Fragment {
         binding = FragmentNavPracticaLeccionBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
+        linearProgressIndicator = view.findViewById(R.id.linearProgressIndicator);
+        textView = view.findViewById(R.id.textView15);
         recyclerView = view.findViewById(R.id.idRecyclerLecciones);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         Bundle bundle = this.getArguments();
-        categoria_id = bundle.getString("id");
+        if (bundle != null) {
+            categoria_id = bundle.getString("id");
+            categoria = bundle.getString("categoria");
+        }
+        textView.setText(categoria);
 
-        listaLecciones = new ArrayList<>();
         adapter = new ListaLeccionesAdapter(listaLecciones, getContext(), listaProgreso, categoria_id);
         recyclerView.setAdapter(adapter);
 
-        query = FirebaseDatabase.getInstance().getReference("categorias").child(categoria_id).child("lecciones").orderByChild("titulo");
-        valueEventListener = query.addValueEventListener(new nav_practica_leccion.listener());
+        // ViewModel initialization
+        listaLeccionesViewModel = new ViewModelProvider(this).get(ListaLeccionesViewModel.class);
+        listaProgresoUsuarioViewModel = new ViewModelProvider(this).get(ListaProgresoUsuarioViewModel.class);
 
-        query = FirebaseDatabase.getInstance().getReference("progreso_usuarios").orderByChild("usuario_id").equalTo(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        valueEventListener = query.addValueEventListener(new nav_practica_leccion.listenerProgreso());
+        // Observe changes in lessons data
+        listaLeccionesViewModel.getLeccionesResult().observe(getViewLifecycleOwner(), new Observer<ListaLeccionesViewModel.LeccionesResult>() {
+            @Override
+            public void onChanged(ListaLeccionesViewModel.LeccionesResult leccionesResult) {
+                if (leccionesResult.error != null) {
+                    // Handle error
+                    Log.e("FirebaseError", leccionesResult.error);
+                    Snackbar.make(view, leccionesResult.error, Snackbar.LENGTH_LONG).show();
+                } else if (leccionesResult.lecciones != null) {
+                    listaLecciones.clear();
+                    listaLecciones.addAll(leccionesResult.lecciones);
+                    adapter.notifyDataSetChanged(); // Update RecyclerView
+
+                    linearProgressIndicator.setVisibility(View.INVISIBLE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        // Fetch lessons data
+        listaLeccionesViewModel.fetchLecciones(categoria_id);
+
+        // Observe changes in user progress data
+        listaProgresoUsuarioViewModel.getProgresoResult().observe(getViewLifecycleOwner(), new Observer<ListaProgresoUsuarioViewModel.ProgresoResult>() {
+            @Override
+            public void onChanged(ListaProgresoUsuarioViewModel.ProgresoResult progresoResult) {
+                if (progresoResult.error != null) {
+                    // Handle error
+                    Log.d("ESTADO listaProgreso", progresoResult.error);
+                    Snackbar.make(view, progresoResult.error, Snackbar.LENGTH_LONG).show();
+                } else {
+                    listaProgreso.clear();
+                    listaProgreso.addAll(progresoResult.progresoUsuarios);
+                    adapter.notifyDataSetChanged(); // Update RecyclerView
+                }
+            }
+        });
+
+        // Fetch user progress data
+        listaProgresoUsuarioViewModel.fetchProgresoUsuarios();
 
         return view;
     }
 
-    class listener implements ValueEventListener {
-
-        @Override
-        public void onDataChange(@NonNull DataSnapshot snapshot) {
-            Log.d("SNAPSHOT EXISTS", "SNAPTHOS EXISTS: " + snapshot.exists());
-            if (snapshot.exists()) { //Nodo referente existe
-                listaLecciones.clear();
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    Leccion leccion = ds.getValue(Leccion.class);
-                    listaLecciones.add(leccion);
-                }
-                adapter.notifyDataSetChanged();
-            } else {
-                listaLecciones.clear();
-                adapter.notifyDataSetChanged();
-            }
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError error) {
-            Log.e("msg", "Error onCancelled", error.toException());
-            Snackbar.make(getActivity().findViewById(android.R.id.content), "Error: " + error.toString(), Snackbar.LENGTH_LONG).show();
-        }
-    }
-
-    class listenerProgreso implements ValueEventListener {
-
-        @Override
-        public void onDataChange(@NonNull DataSnapshot snapshot) {
-            if (snapshot.exists()) { //Nodo referente existe
-                listaProgreso.clear();
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    ProgresoUsuario progresoUsuario = ds.getValue(ProgresoUsuario.class);
-                    listaProgreso.add(progresoUsuario);
-                }
-                adapter.notifyDataSetChanged();
-            } else {
-                listaProgreso.clear();
-                adapter.notifyDataSetChanged();
-            }
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError error) {
-            Log.e("msg", "Error onCancelled", error.toException());
-            Snackbar.make(getActivity().findViewById(android.R.id.content), "Error: " + error.toString(), Snackbar.LENGTH_LONG).show();
-        }
-    }
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        query.removeEventListener(valueEventListener);
-        //databaseReference.removeEventListener(valueEventListener);
-        binding = null;
-    }
 }

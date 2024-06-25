@@ -94,6 +94,7 @@ public class ListaCategoriasAdapter extends RecyclerView.Adapter<ListaCategorias
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putString("id", categoria.getCategoria_id());
+                bundle.putString("categoria", categoria.getCategoria());
                 Navigation.findNavController(v).navigate(R.id.nav_practica_leccion, bundle);
             }
         });
