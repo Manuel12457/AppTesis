@@ -1,54 +1,44 @@
 package com.example.apptesis.fragments;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.navigation.Navigation;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CalendarView;
-import android.widget.TextView;
+import android.widget.Button;
 
 import com.example.apptesis.R;
 import com.example.apptesis.databinding.FragmentNavCalendarioBinding;
+import com.example.apptesis.databinding.FragmentNavPracticaPracticaBinding;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class nav_calendario extends Fragment {
+public class nav_practica_practica extends Fragment {
 
-    private FragmentNavCalendarioBinding binding;
-    TextView textoFechaCalendario;
-    CalendarView calendarView;
-    String MES[] = {"enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"};
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    private FragmentNavPracticaPracticaBinding binding;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        binding = FragmentNavCalendarioBinding.inflate(inflater, container, false);
+        binding = FragmentNavPracticaPracticaBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
-
-        textoFechaCalendario = view.findViewById(R.id.idTextFechaCalendario);
-        calendarView = view.findViewById(R.id.idCalendarView);
-
-        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                textoFechaCalendario.setText(dayOfMonth + " " + MES[month]);
-            }
-        });
 
         return view;
     }
@@ -60,13 +50,13 @@ public class nav_calendario extends Fragment {
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.menu_calendario, menu);
+                menuInflater.inflate(R.menu.menu_practica, menu);
             }
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.nuevoEvento) {
-                    Navigation.findNavController(view).navigate(R.id.nav_eventoEdicion);
+                if (menuItem.getItemId() == R.id.configuracionPractica) {
+                    Navigation.findNavController(view).navigate(R.id.nav_configuracion);
                     return true;
                 }
                 return false;

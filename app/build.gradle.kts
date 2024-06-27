@@ -43,6 +43,9 @@ dependencies {
 
     implementation("androidx.work:work-runtime:2.7.0")
 
+    implementation("androidx.room:room-runtime:2.2.5")
+    annotationProcessor("androidx.room:room-compiler:2.2.5")
+
     implementation("com.google.firebase:firebase-auth")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
     implementation("com.google.android.gms:play-services-auth")

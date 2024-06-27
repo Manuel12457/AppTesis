@@ -57,11 +57,6 @@
     <string name="calendario_evento_minutos_antes">10 min. antes</string>
     <string name="calendario_evento_notas">Notas</string>
     <string name="calendario_evento_notas_cuerpo">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod  tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim  veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea  commodo consequat. Duis aute irure dolor in reprehenderit in voluptate  velit esse cillum dolore eu fugiat nulla pariatur.</string>
-    <string-array name="menu_aviso">
-        <item>10 min</item>
-        <item>30 min</item>
-        <item>60 min</item>
-    </string-array>
 
     <string name="perfil_nombre_completo">Manuel Alejandro Flores Caycho</string>
     <string name="perfil_correo">a20190133@pucp.edu.pe</string>
@@ -74,5 +69,19 @@
     <string name="perfil_progreso">Progreso</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="menu_aviso">
+        <item>10 min</item>
+        <item>30 min</item>
+        <item>60 min</item>
+    </string-array>
+
+    <string name="calendario_fecha">4 mayo</string>
+    <string name="evento_hora">10:30</string>
+    <string name="evento_titulo">Tercera lección - Dactilogía</string>
+    <string name="evento_duracion">10:30 - 11:00</string>
+
+    <string name="title_tiempo_real">Tiempo real</string>
+    <string name="title_galeria">Galería</string>
 
 </resources>

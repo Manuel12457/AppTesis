@@ -15,40 +15,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CalendarView;
-import android.widget.TextView;
 
 import com.example.apptesis.R;
-import com.example.apptesis.databinding.FragmentNavCalendarioBinding;
+import com.example.apptesis.databinding.FragmentNavHistorialBinding;
+import com.example.apptesis.databinding.FragmentNavModoLibreBinding;
 
-public class nav_calendario extends Fragment {
+public class nav_historial extends Fragment {
 
-    private FragmentNavCalendarioBinding binding;
-    TextView textoFechaCalendario;
-    CalendarView calendarView;
-    String MES[] = {"enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"};
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
+    FragmentNavHistorialBinding binding;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        binding = FragmentNavCalendarioBinding.inflate(inflater, container, false);
+        binding = FragmentNavHistorialBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
-        textoFechaCalendario = view.findViewById(R.id.idTextFechaCalendario);
-        calendarView = view.findViewById(R.id.idCalendarView);
-
-        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                textoFechaCalendario.setText(dayOfMonth + " " + MES[month]);
-            }
-        });
 
         return view;
     }
@@ -60,13 +41,13 @@ public class nav_calendario extends Fragment {
         requireActivity().addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.menu_calendario, menu);
+                menuInflater.inflate(R.menu.menu_historial, menu);
             }
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.nuevoEvento) {
-                    Navigation.findNavController(view).navigate(R.id.nav_eventoEdicion);
+                if (menuItem.getItemId() == R.id.borrarHistorial) {
+
                     return true;
                 }
                 return false;

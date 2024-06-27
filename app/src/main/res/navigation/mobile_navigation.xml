@@ -15,13 +15,24 @@
         android:id="@+id/nav_calendario"
         android:name="com.example.apptesis.fragments.nav_calendario"
         android:label="@string/menu_calendario"
-        tools:layout="@layout/fragment_nav_calendario" />
+        tools:layout="@layout/fragment_nav_calendario" >
+        <action
+            android:id="@+id/action_nav_calendario_to_nav_evento"
+            app:destination="@id/nav_evento" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_modo_libre"
         android:name="com.example.apptesis.fragments.nav_modoLibre"
         android:label="@string/menu_modo_libre"
-        tools:layout="@layout/fragment_nav_modo_libre" />
+        tools:layout="@layout/fragment_nav_modo_libre" >
+        <action
+            android:id="@+id/action_nav_modo_libre_to_nav_configuracion"
+            app:destination="@id/nav_configuracion" />
+        <action
+            android:id="@+id/action_nav_modo_libre_to_nav_historial"
+            app:destination="@id/nav_historial" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_practica"
@@ -45,6 +56,48 @@
         android:id="@+id/nav_practica_leccion_detalle"
         android:name="com.example.apptesis.fragments.nav_practica_leccion_detalle"
         android:label="fragment_nav_practica_leccion_detalle"
-        tools:layout="@layout/fragment_nav_practica_leccion_detalle" />
+        tools:layout="@layout/fragment_nav_practica_leccion_detalle" >
+        <action
+            android:id="@+id/action_nav_practica_leccion_detalle_to_nav_practica_practica"
+            app:destination="@id/nav_practica_practica" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_practica_practica"
+        android:name="com.example.apptesis.fragments.nav_practica_practica"
+        android:label="fragment_nav_practica_practica"
+        tools:layout="@layout/fragment_nav_practica_practica" >
+        <action
+            android:id="@+id/action_nav_practica_practica_to_nav_configuracion"
+            app:destination="@id/nav_configuracion" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_configuracion"
+        android:name="com.example.apptesis.fragments.nav_configuracion"
+        android:label="fragment_nav_configuracion"
+        tools:layout="@layout/fragment_nav_configuracion" />
+
+    <fragment
+        android:id="@+id/nav_evento"
+        android:name="com.example.apptesis.fragments.nav_evento"
+        android:label="fragment_nav_evento"
+        tools:layout="@layout/fragment_nav_evento" >
+        <action
+            android:id="@+id/action_nav_evento_to_nav_eventoEdicion"
+            app:destination="@id/nav_eventoEdicion" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_eventoEdicion"
+        android:name="com.example.apptesis.fragments.nav_eventoEdicion"
+        android:label="fragment_nav_eventoEdicion"
+        tools:layout="@layout/fragment_nav_evento_edicion" />
+
+    <fragment
+        android:id="@+id/nav_historial"
+        android:name="com.example.apptesis.fragments.nav_historial"
+        android:label="fragment_nav_historial"
+        tools:layout="@layout/fragment_nav_historial" />
 
 </navigation>

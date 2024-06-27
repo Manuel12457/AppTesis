@@ -19,6 +19,7 @@ import com.example.apptesis.clases.Usuario;
 import com.example.apptesis.internet.NetworkChangeReceiver;
 import com.example.apptesis.internet.NetworkViewModel;
 import com.example.apptesis.viewModels.UsuarioPerfilViewModel;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -132,13 +133,31 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        BottomNavigationView bottomnavView = findViewById(R.id.nav_view_bottom);
+        NavigationUI.setupWithNavController(bottomnavView, navController);
+
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
             public void onDestinationChanged(@NonNull NavController navController, @NonNull NavDestination navDestination, @Nullable Bundle bundle) {
                 if (navDestination.getId() == R.id.nav_practica_leccion) {
                     getSupportActionBar().setTitle("Lección");
+                    bottomnavView.setVisibility(View.INVISIBLE);
                 } else if (navDestination.getId() == R.id.nav_practica_leccion_detalle) {
                     getSupportActionBar().setTitle("Detalles de la lección");
+                    bottomnavView.setVisibility(View.INVISIBLE);
+                } else if (navDestination.getId() == R.id.nav_evento) {
+                    getSupportActionBar().setTitle("Detalles del evento");
+                    bottomnavView.setVisibility(View.INVISIBLE);
+                } else if (navDestination.getId() == R.id.nav_configuracion) {
+                    getSupportActionBar().setTitle("Configuración");
+                    bottomnavView.setVisibility(View.INVISIBLE);
+                } else if (navDestination.getId() == R.id.nav_historial) {
+                    getSupportActionBar().setTitle("Historial");
+                    bottomnavView.setVisibility(View.INVISIBLE);
+                } else if (navDestination.getId() == R.id.nav_modo_libre) {
+                    bottomnavView.setVisibility(View.VISIBLE);
+                } else if (navDestination.getId() == R.id.nav_calendario || navDestination.getId() == R.id.nav_calendario || navDestination.getId() == R.id.nav_eventoEdicion || navDestination.getId() == R.id.nav_perfil || navDestination.getId() == R.id.nav_practica || navDestination.getId() == R.id.nav_practica_leccion  || navDestination.getId() == R.id.nav_practica_practica) {
+                    bottomnavView.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -171,12 +190,12 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
-    }
+    }*/
 
     @Override
     public boolean onSupportNavigateUp() {
