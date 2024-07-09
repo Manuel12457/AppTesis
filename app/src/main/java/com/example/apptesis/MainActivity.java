@@ -156,7 +156,10 @@ public class MainActivity extends AppCompatActivity {
                     bottomnavView.setVisibility(View.INVISIBLE);
                 } else if (navDestination.getId() == R.id.nav_modo_libre) {
                     bottomnavView.setVisibility(View.VISIBLE);
-                } else if (navDestination.getId() == R.id.nav_calendario || navDestination.getId() == R.id.nav_calendario || navDestination.getId() == R.id.nav_eventoEdicion || navDestination.getId() == R.id.nav_perfil || navDestination.getId() == R.id.nav_practica || navDestination.getId() == R.id.nav_practica_leccion  || navDestination.getId() == R.id.nav_practica_practica) {
+                } else if (navDestination.getId() == R.id.nav_eventoEdicion) {
+                    getSupportActionBar().setTitle("");
+                    bottomnavView.setVisibility(View.INVISIBLE);
+                } else if (navDestination.getId() == R.id.nav_calendario || navDestination.getId() == R.id.nav_perfil || navDestination.getId() == R.id.nav_practica || navDestination.getId() == R.id.nav_practica_leccion  || navDestination.getId() == R.id.nav_practica_practica) {
                     bottomnavView.setVisibility(View.INVISIBLE);
                 }
             }

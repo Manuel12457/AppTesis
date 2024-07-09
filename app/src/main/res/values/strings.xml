@@ -50,7 +50,7 @@
     <string name="calendario_evento_titulo">Tercera lección - Dactilogía</string>
     <string name="calendario_evento_fecha">Sábado 4 de mayo</string>
     <string name="calendario_evento_hora">10:30 - 11:00</string>
-    <string name="calendario_evento_duracion">30 min</string>
+    <string name="calendario_evento_duracion">10 min</string>
     <string name="calendario_evento_tiempo">Tiempo</string>
     <string name="calendario_evento_lecciones">Lecciones</string>
     <string name="calendario_evento_aviso">Aviso</string>
@@ -70,11 +70,9 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <string-array name="menu_aviso">
-        <item>10 min</item>
-        <item>30 min</item>
-        <item>60 min</item>
-    </string-array>
+    <string name="ten_min">10 min</string>
+    <string name="thirty_min">30 min</string>
+    <string name="sixty_min">60 min</string>
 
     <string name="calendario_fecha">4 mayo</string>
     <string name="evento_hora">10:30</string>

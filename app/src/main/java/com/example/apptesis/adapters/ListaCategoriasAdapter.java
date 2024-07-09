@@ -120,4 +120,5 @@ public class ListaCategoriasAdapter extends RecyclerView.Adapter<ListaCategorias
 
         }
     }
+
 }
