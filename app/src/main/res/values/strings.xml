@@ -17,6 +17,8 @@
     <string name="menu_modo_libre">Modo libre</string>
     <string name="menu_practica">Práctica</string>
     <string name="menu_sign_out">Cerrar sesión</string>
+    <string name="historial">Historial</string>
+    <string name="noListaHistorial">No se ha registrado ningún gesto en el historial</string>
 
     <string name="inicio_sesion_title">Iniciar sesión</string>
     <string name="cambio_contrasenia_title">Cambio de contraseña</string>

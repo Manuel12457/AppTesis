@@ -46,6 +46,7 @@ public class nav_practica_leccion_detalle extends Fragment {
     boolean aprendido;
     LinearProgressIndicator linearProgressIndicator;
     LinearLayout linearLayout;
+    String img;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -84,6 +85,7 @@ public class nav_practica_leccion_detalle extends Fragment {
                             navTituloLeccion.setText(l.getTitulo());
                             navDescripcionLeccion.setText(l.getDescripcion());
                             for (Map.Entry<String, String> entry : l.getImagen().entrySet()) {
+                                img = entry.getValue();
                                 Glide.with(getActivity())
                                         .load(entry.getValue())
                                         .into(navImagenUsuario);
@@ -115,7 +117,11 @@ public class nav_practica_leccion_detalle extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Navigation.findNavController(v).navigate(R.id.nav_practica_practica);
+                Bundle bundle = new Bundle();
+                bundle.putString("categoria_id", categoria_id);
+                bundle.putString("leccion_id", leccion_id);
+                bundle.putString("img", img);
+                Navigation.findNavController(v).navigate(R.id.nav_practica_practica, bundle);
             }
         });
     }

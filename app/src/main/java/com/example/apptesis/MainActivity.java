@@ -26,6 +26,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -126,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         usuarioPerfilViewModel.fetchUserData();
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_perfil, R.id.nav_calendario, R.id.nav_modo_libre, R.id.nav_practica)
+                R.id.nav_perfil, R.id.nav_calendario, R.id.nav_modo_libre, R.id.nav_practica,R.id.nav_modo_libre,R.id.nav_modo_libre_galeria)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -154,9 +155,9 @@ public class MainActivity extends AppCompatActivity {
                 } else if (navDestination.getId() == R.id.nav_historial) {
                     getSupportActionBar().setTitle("Historial");
                     bottomnavView.setVisibility(View.INVISIBLE);
-                } else if (navDestination.getId() == R.id.nav_modo_libre) {
+                } else if (navDestination.getId() == R.id.nav_modo_libre || navDestination.getId() == R.id.nav_modo_libre_galeria) {
                     bottomnavView.setVisibility(View.VISIBLE);
-                } else if (navDestination.getId() == R.id.nav_eventoEdicion) {
+                } else if (navDestination.getId() == R.id.nav_eventoEdicion || navDestination.getId() == R.id.nav_practica_practica) {
                     getSupportActionBar().setTitle("");
                     bottomnavView.setVisibility(View.INVISIBLE);
                 } else if (navDestination.getId() == R.id.nav_calendario || navDestination.getId() == R.id.nav_perfil || navDestination.getId() == R.id.nav_practica || navDestination.getId() == R.id.nav_practica_leccion  || navDestination.getId() == R.id.nav_practica_practica) {
@@ -213,4 +214,14 @@ public class MainActivity extends AppCompatActivity {
         moveTaskToBack(true);
         return super.getOnBackInvokedDispatcher();
     }*/
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // Delegar el resultado de la solicitud de permisos al fragmento activo
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
+        if (fragment != null) {
+            fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
 }

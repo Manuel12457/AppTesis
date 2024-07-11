@@ -6,7 +6,7 @@
         android:icon="@drawable/baseline_autorenew_24"
         android:title="@string/title_tiempo_real" />
     <item
-        android:id="@+id/nav_practica_practica"
+        android:id="@+id/nav_modo_libre_galeria"
         android:icon="@drawable/baseline_image_24"
         android:title="@string/title_galeria" />
 

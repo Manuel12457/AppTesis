@@ -32,6 +32,25 @@
         <action
             android:id="@+id/action_nav_modo_libre_to_nav_historial"
             app:destination="@id/nav_historial" />
+        <action
+            android:id="@+id/action_nav_modo_libre_to_nav_modo_libre_galeria"
+            app:destination="@id/nav_modo_libre_galeria" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_modo_libre_galeria"
+        android:name="com.example.apptesis.fragments.nav_modoLibre_galeria"
+        android:label="@string/menu_modo_libre"
+        tools:layout="@layout/fragment_nav_modo_libre_galeria" >
+        <action
+            android:id="@+id/action_nav_modo_libre_galeria_to_nav_modo_libre"
+            app:destination="@id/nav_modo_libre" />
+        <action
+            android:id="@+id/action_nav_modo_libre_galeria_to_nav_historial"
+            app:destination="@id/nav_historial" />
+        <action
+            android:id="@+id/action_nav_modo_libre_galeria_to_nav_configuracion"
+            app:destination="@id/nav_configuracion" />
     </fragment>
 
     <fragment

@@ -4,6 +4,16 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <!-- Permiso para acceder a la cámara -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Declaración de la funcionalidad de la cámara -->
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+
+    <!-- Opcional: si también quieres soportar cámaras frontales -->
+    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
 
     <application
         android:name=".internet.MyApplication"
